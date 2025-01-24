@@ -34,10 +34,30 @@ def main():
     #
     # TODO: Modify the URL
     #
-    url.token = 'TODO'
-    url.suffix += 'TODO'
+    prefix = url.prefix
+    token = url.token
+    suffix = url.suffix
 
-    print(url)
+    padded_token_len = len(str(token)) + len(str(suffix))
+    print("Prefix: " + str(prefix))
+    print("Token: " + str(token))
+    print("Suffix: " + str(suffix))
+    print("Padded url len: " + str(padded_token_len))
+
+    m = (str(token) + str(suffix)).encode()
+
+    h1 = sha256()
+    h1.update(m)
+    print(h1.hexdigest())
+
+    h2 = sha256(state=bytes.fromhex(str(h1.hexdigest())), count=padded_token_len)
+    suffix = "command=UnlockSafes".encode()
+    h2.update(suffix)
+    print(str(prefix) + h2.hexdigest() + str(suffix))
+    #url.token = 'TODO'
+    #http://cpsc4200.mpese.com/madduxr/lengthextension/api?token=9690858e07b50439d794c771f1b55fb9ee52104f1a66017d55962aaf71b94f68&command=SprinklersPowerOn
+
+    print("URL: " + str(url))
 
 
 if __name__ == '__main__':
