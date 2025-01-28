@@ -38,22 +38,26 @@ def main():
     token = url.token
     suffix = url.suffix
 
-    padded_token_len = len(str(token)) + len(str(suffix))
+    secret_key_len = 8
+
+    full_token_len = secret_key_len + len(suffix)
+    padded_message_len = full_token_len + len(padding(full_token_len))
     print("Prefix: " + str(prefix))
     print("Token: " + str(token))
     print("Suffix: " + str(suffix))
-    print("Padded url len: " + str(padded_token_len))
+    print("Padded m len: " + str(padded_message_len))
 
-    m = (str(token) + str(suffix)).encode()
+    #m = (token).encode()
 
-    h1 = sha256()
-    h1.update(m)
-    print(h1.hexdigest())
-
-    h2 = sha256(state=bytes.fromhex(str(h1.hexdigest())), count=padded_token_len)
-    suffix = "command=UnlockSafes".encode()
-    h2.update(suffix)
-    print(str(prefix) + h2.hexdigest() + str(suffix))
+    suffix += "&command=UnlockSafes"
+    #amount_to_pad = original_token_len - new_token_len
+    h2 = sha256(state=bytes.fromhex(str(token)), count=padded_message_len)
+    #print(quote(padding(full_token_len)))
+    h2.update(suffix.encode())
+    token = h2.hexdigest()
+    new_suffix = quote(padding(full_token_len)) + suffix
+    #use quote somewhere
+    print(prefix + h2.hexdigest() + "&" + url.suffix + new_suffix)
     #url.token = 'TODO'
     #http://cpsc4200.mpese.com/madduxr/lengthextension/api?token=9690858e07b50439d794c771f1b55fb9ee52104f1a66017d55962aaf71b94f68&command=SprinklersPowerOn
 
