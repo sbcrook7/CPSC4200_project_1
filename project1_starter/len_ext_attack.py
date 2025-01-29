@@ -31,13 +31,29 @@ def main():
 
     url = URL(sys.argv[1])
 
-    #
-    # TODO: Modify the URL
-    #
-    url.token = 'TODO'
-    url.suffix += 'TODO'
+    prefix = url.prefix
+    token = url.token
+    suffix = url.suffix
 
-    print(url)
+    #length of unknown secret password used
+    secret_key_len = 8
+
+    #token len would be key_len + len of suffix
+    full_token_len = secret_key_len + len(suffix)
+    #padded token len would be full token len + padding len
+    padded_token_len = full_token_len + len(padding(full_token_len))
+
+    #edit suffix to command we actually want
+    suffix += "&command=UnlockSafes"
+    #create new hash from previous state and count needs to be the padded len
+    h2 = sha256(state=bytes.fromhex(str(token)), count=padded_token_len)
+    #update the hash with this new suffix
+    h2.update(suffix.encode())
+    token = h2.hexdigest()
+    #convert non-ascii characters and put them into url + new suffix
+    new_suffix = quote(padding(full_token_len)) + suffix
+    #print URL
+    print(prefix + h2.hexdigest() + "&" + url.suffix + new_suffix)
 
 
 if __name__ == '__main__':
