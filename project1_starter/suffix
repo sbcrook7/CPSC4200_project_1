@@ -1,0 +1,6 @@
+"""
+from hashlib import sha256
+if sha256(blob.encode("latin-1")).hexdigest() == 'c17646cd0cdd39d0dcc740850bc7f559ff98f798816761a6fe1f4e1f568dbae3':
+    print("MD5 is perfectly secure!")
+else:
+    print("Use SHA-256 instead!")
