@@ -31,37 +31,29 @@ def main():
 
     url = URL(sys.argv[1])
 
-    #
-    # TODO: Modify the URL
-    #
     prefix = url.prefix
     token = url.token
     suffix = url.suffix
 
+    #length of unknown secret password used
     secret_key_len = 8
 
+    #token len would be key_len + len of suffix
     full_token_len = secret_key_len + len(suffix)
-    padded_message_len = full_token_len + len(padding(full_token_len))
-    print("Prefix: " + str(prefix))
-    print("Token: " + str(token))
-    print("Suffix: " + str(suffix))
-    print("Padded m len: " + str(padded_message_len))
+    #padded token len would be full token len + padding len
+    padded_token_len = full_token_len + len(padding(full_token_len))
 
-    #m = (token).encode()
-
+    #edit suffix to command we actually want
     suffix += "&command=UnlockSafes"
-    #amount_to_pad = original_token_len - new_token_len
-    h2 = sha256(state=bytes.fromhex(str(token)), count=padded_message_len)
-    #print(quote(padding(full_token_len)))
+    #create new hash from previous state and count needs to be the padded len
+    h2 = sha256(state=bytes.fromhex(str(token)), count=padded_token_len)
+    #update the hash with this new suffix
     h2.update(suffix.encode())
     token = h2.hexdigest()
+    #convert non-ascii characters and put them into url + new suffix
     new_suffix = quote(padding(full_token_len)) + suffix
-    #use quote somewhere
+    #print URL
     print(prefix + h2.hexdigest() + "&" + url.suffix + new_suffix)
-    #url.token = 'TODO'
-    #http://cpsc4200.mpese.com/madduxr/lengthextension/api?token=9690858e07b50439d794c771f1b55fb9ee52104f1a66017d55962aaf71b94f68&command=SprinklersPowerOn
-
-    print("URL: " + str(url))
 
 
 if __name__ == '__main__':
